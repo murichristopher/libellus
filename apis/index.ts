@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import "./src/config";
 import User from "./src/routes/user";
+import authenticateUser from "./src/middlewares/authenticateUser";
 
 dotenv.config();
 

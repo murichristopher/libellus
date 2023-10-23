@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create = exports.findByEmail = exports.all = void 0;
+exports.create = exports.findById = exports.findByEmail = exports.all = void 0;
 const user_1 = require("../models/user");
 const all = () => {
     return user_1.User.find();
@@ -19,5 +19,15 @@ const findByEmail = (email) => {
     return user_1.User.findOne({ email: email });
 };
 exports.findByEmail = findByEmail;
-const create = (user) => __awaiter(void 0, void 0, void 0, function* () { return user_1.User.create(user); });
+const findById = (id) => {
+    return user_1.User.findOne({ _id: id });
+};
+exports.findById = findById;
+const create = (name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
+    return user_1.User.create({
+        name,
+        email,
+        password,
+    });
+});
 exports.create = create;

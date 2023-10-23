@@ -1,4 +1,5 @@
-export const useCounterStore = defineStore("counter", {
+eexport const useCounterStore = defineStore("counter", {
+
   state: () => ({
     count: 44,
   }),

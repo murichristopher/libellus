@@ -31,9 +31,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logInUser = exports.createUser = exports.fetchUsers = void 0;
+exports.logInUser = exports.createUser = exports.fetchUsers = exports.profile = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const UserRepository = __importStar(require("../repositories/user"));
+const profile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield UserRepository.findById(req.user.userId);
+    return res.status(200).json(user);
+});
+exports.profile = profile;
 const fetchUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         res.status(200).json(yield UserRepository.all());
@@ -46,11 +55,32 @@ exports.fetchUsers = fetchUsers;
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password } = req.body;
     try {
-        const newUser = yield UserRepository.create(req.body);
-        return res.status(200).json(newUser);
+        const newUser = yield UserRepository.create(name, email, password);
+        const payload = {
+            userId: newUser.id,
+            userEmail: newUser.email,
+        };
+        const token = jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET);
+        return res.status(201).json({ newUser, token });
     }
     catch (error) {
-        res.status(500).json(error);
+        const err = error;
+        console.error(error);
+        if (err.name === "ValidationError") {
+            return res
+                .status(400)
+                .json({ message: "Validation Error", details: err.message });
+        }
+        if (err.code === 11000) {
+            return res.status(409).json({
+                message: "Duplicate Key Error",
+                details: "Email already exists",
+            });
+        }
+        return res.status(500).json({
+            message: "Internal Server Error",
+            details: "An unexpected error occurred",
+        });
     }
 });
 exports.createUser = createUser;
@@ -58,8 +88,13 @@ const logInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     const user = yield UserRepository.findByEmail(email);
     try {
-        if (email && password && (user === null || user === void 0 ? void 0 : user.password) === password) {
-            return res.status(200).json(user);
+        if (user && email && password && (user === null || user === void 0 ? void 0 : user.password) === password) {
+            const payload = {
+                userId: user.id,
+                userEmail: user.email,
+            };
+            const token = jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET);
+            return res.status(200).json({ user, token });
         }
         else {
             return res.status(401).json({ message: "Unauthorized" });

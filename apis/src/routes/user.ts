@@ -1,13 +1,15 @@
 import { Router } from "express";
-
-import { createUser, fetchUsers, logInUser } from "../controllers/user";
+import { fetchUsers, logInUser, createUser, profile } from "../controllers/user";
+import authenticateUser from "../middlewares/authenticateUser";
 
 const User = Router();
 
-User.get("/", fetchUsers);
+User.get("/", authenticateUser, fetchUsers);
 
-User.post("/", createUser);
+User.get("/profile", authenticateUser, profile);
 
 User.post("/login", logInUser);
+
+User.post("/signup", createUser);
 
 export default User;

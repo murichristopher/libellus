@@ -18,6 +18,7 @@
     "@oruga-ui/theme-oruga": "^0.0.1",
     "@pinia/nuxt": "^0.4.11",
     "buefy": "^0.9.25",
+    "cookie-universal-nuxt": "^2.2.2",
     "nuxt": "^3.7.4",
     "pinia": "^2.1.6",
     "postcss-custom-properties": "^13.3.2",
